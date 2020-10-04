@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import path from 'path';
 import inquirer from 'inquirer';
-import { getAcceptor, getAverageBondLength, getBonds, getDonor, getFormula, getIUPACName, getLogP, getLogS, getMolFile, getPolarSurfaceArea, getRotatableBond, getStereoCenter, getWeight, molToSmiles } from 'aromaticity-core';
+import { getAcceptor, getAverageBondLength, getBonds, getDonor, getFormula, getIUPACName, getLogP, getLogS, getMolFile, getPolarSurfaceArea, getRotatableBond, getStereoCenter, getWeight, molFileToMol, molToSmiles } from 'aromaticity-core';
 import { version } from '../package.json';
 
 function parseArgumentsIntoOptions(rawArgs){
@@ -82,7 +82,7 @@ export async function cli(args){
     var smiles;
 
     if(options.version){
-        console.log(`%s v${version} \n\nLicense: GPL-3.0\nGitHub Repository: https://github.com/themagiulio/aromaticity_cli\nWebsite: https://aromaticity.io/cli \n\nDeveloped by Giulio De Matteis`, chalk.magentaBright.bold('aromaticity CLI'))
+        console.log(`%s v${version} \n\nLicense: GPL-3.0\nGitHub Repository: https://github.com/aromaticity/aromaticity-cli\nWebsite: https://aromaticity.io/cli \n\nDeveloped by Giulio De Matteis`, chalk.magentaBright.bold('aromaticity CLI'))
         return;
     }
 
@@ -130,7 +130,7 @@ export async function cli(args){
     if(options.name){
         await getIUPACName(smiles, (IUPACName) => {
             console.log(`%s ${IUPACName}`, chalk.green.bold('IUPAC NAME'));
-        });
+        }, true);
     }
 
     if(options.polarSurfaceArea){
