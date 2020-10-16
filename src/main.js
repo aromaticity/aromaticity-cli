@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import path from 'path';
 import inquirer from 'inquirer';
-import { getAcceptor, getAverageBondLength, getBonds, getDonor, getFormula, getIUPACName, getLogP, getLogS, getMolFile, getPolarSurfaceArea, getRotatableBond, getStereoCenter, getWeight, molFileToMol, molToSmiles } from 'aromaticity-core';
+import { Molecule } from 'aromaticity-core';
 import { version } from '../package.json';
 
 function parseArgumentsIntoOptions(rawArgs){
@@ -92,61 +92,60 @@ export async function cli(args){
     }
 
 
-     if(fs.existsSync(options.import)){
-        mol = molFileToMol(fs.readFileSync(options.import, 'utf8'));
-        smiles = molToSmiles(mol);
+     if(fs.existsSync(options.import) && fs.lstatSync(options.import).isFile()){
+        mol = new Molecule(options.import);
     }else{
-        smiles = options.import;
+        mol = new Molecule(options.import);
     }
 
     if(options.acceptor){
-        await console.log(`%s ${getAcceptor(smiles)}`, chalk.green.bold('ACCEPTOR'));
+        await console.log(`%s ${mol.acceptor}`, chalk.green.bold('ACCEPTOR'));
     }
 
     if(options.averageBondLength){
-        await console.log(`%s ${getAverageBondLength(smiles, options.nonHydrogenBondsOnly)}`, chalk.green.bold('AVERAGE BOND LENGTH'));
+        await console.log(`%s ${mol.averageBondLength(options.nonHydrogenBondsOnly)}`, chalk.green.bold('AVERAGE BOND LENGTH'));
     }
 
     if(options.bonds){
-        await console.log(`%s ${getBonds(smiles)}`, chalk.green.bold('BONDS'))
+        await console.log(`%s ${mol.bonds}`, chalk.green.bold('BONDS'))
     }
 
     if(options.donor){
-        await console.log(`%s ${getDonor(smiles)}`, chalk.green.bold('DONOR'));
+        await console.log(`%s ${mol.donor}`, chalk.green.bold('DONOR'));
     }
     
     if(options.formula){
-        await console.log(`%s ${getFormula(smiles)}`, chalk.green.bold('MOLECULAR FORMULA'));
+        await console.log(`%s ${mol.formula()}`, chalk.green.bold('MOLECULAR FORMULA'));
     }
 
     if(options.logP){
-        await console.log(`%s ${getLogP(smiles)}`, chalk.green.bold('LOGP'));
+        await console.log(`%s ${mol.logP}`, chalk.green.bold('LOGP'));
     }
 
     if(options.logS){
-        await console.log(`%s ${getLogS(smiles)}`, chalk.green.bold('LOGS'));
+        await console.log(`%s ${mol.logS}`, chalk.green.bold('LOGS'));
     }
 
     if(options.name){
-        await getIUPACName(smiles, (IUPACName) => {
-            console.log(`%s ${IUPACName}`, chalk.green.bold('IUPAC NAME'));
-        }, true);
+        await mol.IUPACName((res) => {
+            console.log(`%s ${res}`, chalk.green.bold('IUPAC NAME'));
+        })
     }
 
     if(options.polarSurfaceArea){
-        await console.log(`%s ${getPolarSurfaceArea(smiles)}`, chalk.green.bold('POLAR SURFACE AREA'));
+        await console.log(`%s ${mol.polarSurfaceArea}`, chalk.green.bold('POLAR SURFACE AREA'));
     }
 
     if(options.rotatableBond){
-        await console.log(`%s ${getRotatableBond(smiles)}`, chalk.green.bold('ROTATABLE BOND'));
+        await console.log(`%s ${mol.rotatableBond}`, chalk.green.bold('ROTATABLE BOND'));
     }
 
     if(options.stereoCenter){
-        await console.log(`%s ${getStereoCenter(smiles)}`, chalk.green.bold('STEREO CENTER'));
+        await console.log(`%s ${mol.stereoCenter}`, chalk.green.bold('STEREO CENTER'));
     }
 
     if(options.weight){
-        await console.log(`%s ${getWeight(smiles)}`, chalk.green.bold('MOLECULAR WEIGHT'));
+        await console.log(`%s ${mol.weight}`, chalk.green.bold('MOLECULAR WEIGHT'));
     }
 
     if(options.export){
@@ -172,12 +171,12 @@ export async function cli(args){
         let molFileType;
 
         if(answers.molFileType == 'V2000'){
-            molFileType = false;
-        }else{
             molFileType = true;
+        }else{
+            molFileType = false;
         }
 
-        var molFileText = getMolFile(smiles, molFileType);
+        var molFileText = mol.toMolfile(molFileType);
         var molFile = path.join(process.cwd(), answers.molFileName);
 
         fs.writeFile(molFile, molFileText, function(){
