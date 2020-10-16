@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import path from 'path';
 import inquirer from 'inquirer';
+import terminalImage from 'terminal-image';
 import { Molecule } from 'aromaticity-core';
 import { version } from '../package.json';
 
@@ -24,10 +25,12 @@ function parseArgumentsIntoOptions(rawArgs){
             '--polar-surface-area': Boolean,
             '--rotatable-bond': Boolean,
             '--stereo-center': Boolean,
+            '--svg': Boolean,
             '--version': Boolean,
             '--weight': Boolean,
             '-e': '--export',
             '-i': '--import',
+            '--image': '--svg',
             '-h': '--help',
             '-v': '--version'
         },
@@ -51,6 +54,7 @@ function parseArgumentsIntoOptions(rawArgs){
         polarSurfaceArea: args['--polar-surface-area'] || false,
         rotatableBond: args['--rotatable-bond'] || false,
         stereoCenter: args['--stereo-center'] || false,
+        svg: args['--svg'] || false,
         version: args['--version'] || false,
         weight: args['--weight'] || false,
     };
@@ -87,7 +91,7 @@ export async function cli(args){
     }
 
     if(options.help){
-        console.log("%s \n\nUsage: \naromaticity <SMILES> or <MOLFILE PATH>[--option]\nor just\naromaticity [--option]\n\nIf you choose the second way, you will need to specify the SMILES in a second moment.\n\nIf you use --help (-h) or --version (-v) you don't need to specify SMILES or MOLFILE PATH.\n\n--acceptor                  It returns the acceptor number.\n--average-bond-length       It returns the average bond length (you can remove the hydrogen bonds from calculations using --non-hydrogen-bonds-only).\n--bonds                     It returns the bonds number (bonds connecting plain-H atoms are not included).\n--donor                     It returns the donor number.\n-e, --export                Export the compound as MolFile.\n--formula                   It returns the molecular formula.\n-h, --help                  It shows this help message.\n--logP                      It returns the LogP.\n--logS                      It returns the LogS.\n--name                      It returns the IUPAC Name.\n--non-hydrogen-bonds-only   Use this option to remove hydrogen bonds from specific calculations.\n--polar-surface-area        It returns the polar surface area.\n--rotatable-bond            It returns the rotatable bond number.\n--stereo-center             It returns the stereo center number.\n-v, --version               It returns the version of aromaticity CLI.\n--weight                    It returns the molecular weight.", chalk.magentaBright.bold('aromaticity CLI'))
+        console.log("%s \n\nUsage: \naromaticity <SMILES> or <MOLFILE PATH>[--option]\nor just\naromaticity [--option]\n\nIf you choose the second way, you will need to specify the SMILES in a second moment.\n\nIf you use --help (-h) or --version (-v) you don't need to specify SMILES or MOLFILE PATH.\n\n--acceptor                  It returns the acceptor number.\n--average-bond-length       It returns the average bond length (you can remove the hydrogen bonds from calculations using --non-hydrogen-bonds-only).\n--bonds                     It returns the bonds number (bonds connecting plain-H atoms are not included).\n--donor                     It returns the donor number.\n-e, --export                Export the compound as MolFile.\n--formula                   It returns the molecular formula.\n-h, --help                  It shows this help message.\n--logP                      It returns the LogP.\n--logS                      It returns the LogS.\n--name                      It returns the IUPAC Name.\n--non-hydrogen-bonds-only   Use this option to remove hydrogen bonds from specific calculations.\n--polar-surface-area        It returns the polar surface area.\n--rotatable-bond            It returns the rotatable bond number.\n--stereo-center             It returns the stereo center number.\n--svg, --image              Export the SVG.\n-v, --version               It returns the version of aromaticity CLI.\n--weight                    It returns the molecular weight.", chalk.magentaBright.bold('aromaticity CLI'))
         return;
     }
 
@@ -147,6 +151,40 @@ export async function cli(args){
     if(options.weight){
         await console.log(`%s ${mol.weight}`, chalk.green.bold('MOLECULAR WEIGHT'));
     }
+
+    if(options.svg){
+        const questions = [];
+
+        questions.push({
+            type: 'string',
+            name: 'svgFileName',
+            message: 'Please insert the name of the SVG File',
+            default: 'untitled.svg'
+        })
+    
+        questions.push({
+            type: 'number',
+            name: 'weight',
+            message: 'SVG Weight',
+            default: '400'
+        })
+
+        questions.push({
+            type: 'number',
+            name: 'height',
+            message: 'SVG Height',
+            default: '400'
+        })
+
+        const answers = await inquirer.prompt(questions);
+
+        let molFileType;
+
+
+        fs.writeFile(answers.svgFileName, mol.SVG(answers.weight, answers.height), function(){
+            console.log(`%s The SVG has been successfully exported to: ${answers.svgFileName}`, chalk.green.bold('EXPORT SVG'));
+        })
+    } 
 
     if(options.export){
 

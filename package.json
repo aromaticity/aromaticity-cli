@@ -1,6 +1,6 @@
 {
   "name": "aromaticity-cli",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "",
   "main": "src/main.js",
   "homepage": "https://aromaticity.io/cli",
@@ -25,13 +25,12 @@
     "aromaticity-core": "^1.6.0",
     "chalk": "^4.1.0",
     "esm": "^3.2.25",
-    "fetch-json": "^2.2.8",
     "fs-extra": "^9.0.1",
     "inquirer": "^7.3.3",
     "ncp": "^2.0.0",
-    "node-fetch": "^2.6.1",
     "openchemlib": "^7.2.3",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "terminal-image": "^1.2.1"
   },
   "keywords": [
     "cli",
