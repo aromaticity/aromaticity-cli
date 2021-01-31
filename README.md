@@ -1,5 +1,8 @@
 # aromaticity CLI
 
+[![npm version](https://badge.fury.io/js/aromaticity-cli.svg)](https://badge.fury.io/js/aromaticity-cli)
+[![DeepSource](https://deepsource.io/gh/aromaticity/aromaticity-cli.svg/?label=active+issues)](https://deepsource.io/gh/aromaticity/aromaticity-cli/?ref=repository-badge)
+
 aromaticity CLI lets you use <a href="https://aromaticity.io">aromaticity</a>'s main functions from your terminal.
 
 ## Installation
